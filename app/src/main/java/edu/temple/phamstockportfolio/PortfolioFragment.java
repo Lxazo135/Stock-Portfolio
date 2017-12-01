@@ -25,6 +25,12 @@ public class PortfolioFragment extends Fragment {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(Bundle bundle){
+        super.onCreate(bundle);
+        symbols = new ArrayList<String>();
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -32,9 +38,6 @@ public class PortfolioFragment extends Fragment {
         // Inflate the layout for this fragment
         v = inflater.inflate(R.layout.fragment_portfolio, container, false);
         ListView listView = (ListView) v.findViewById(R.id.listView);
-        symbols = new ArrayList<String>();
-        symbols.add("GOOG");
-        symbols.add("AAPL");
         adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, symbols);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -48,7 +51,9 @@ public class PortfolioFragment extends Fragment {
     }
 
     public void addSymbol(String symbol){
-        adapter.add(symbol);
+        symbols.add(symbol);
+        adapter.notifyDataSetChanged();
+        System.out.println("Array list: " + symbols);
     }
 
     public interface StockSelectable{

@@ -23,7 +23,8 @@ public class SymbolSearch extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(SymbolSearch.this, MainActivity.class);
-                intent.putExtra("symbol",editText.getText().toString());
+                String symbol = editText.getText().toString().toUpperCase();
+                intent.putExtra("symbol", symbol);
                 SymbolSearch.this.startActivity(intent);
             }
         });

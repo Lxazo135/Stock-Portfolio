@@ -33,20 +33,17 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         fm.beginTransaction().
                 add(R.id.viewFrame,nav).
                 commit();
+
     }
 
     @Override
-    public void onResume(){
-        super.onResume();
-        Intent intent = getIntent();
+    public void onNewIntent(Intent intent){
+        super.onNewIntent(intent);
         System.out.println("INTENT: " + intent.toString());
         if(intent.hasExtra("symbol")){
             symbolFromIntent = intent.getStringExtra("symbol");
             System.out.println("SYMBOLZZZZ: " + symbolFromIntent);
             nav.addSymbol(symbolFromIntent);
-            fm.beginTransaction().
-                    replace(R.id.viewFrame,nav).
-                    commit();
         }
     }
 

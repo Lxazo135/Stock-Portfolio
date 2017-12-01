@@ -86,9 +86,21 @@ public class StockDetailsService extends Service {
         if(!stockFile.exists()){
             stockFile.createNewFile();
         }
-        FileWriter fw = new FileWriter(stockFile);
+        FileWriter fw = new FileWriter(stockFile, true);
         fw.append(json);
         fw.append("\n");
+        fw.flush();
+        fw.close();
+    }
+
+    public void clearFile(String fileName) throws IOException {
+        File stockFile = new File(this.getFilesDir(), fileName);
+        if(!stockFile.exists()){
+            stockFile.createNewFile();
+        }
+
+        FileWriter fw = new FileWriter(stockFile);
+        fw.append("");
         fw.flush();
         fw.close();
     }

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -31,6 +32,8 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
     final String FILE_NAME = "Stocks.txt";
     String json;
     ServiceConnection serverConnection;
+    Handler handler;
+    String jsonFromFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,32 +70,41 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
     public void onNewIntent(Intent intent){
         super.onNewIntent(intent);
         System.out.println("INTENT: " + intent.toString());
+        handler = new Handler();
         if(intent.hasExtra("symbol")){
             symbolFromIntent = intent.getStringExtra("symbol");
             System.out.println("SYMBOLZZZZ: " + symbolFromIntent);
             nav.addSymbol(symbolFromIntent);
+
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     json = server.getJson(HTTP + symbolFromIntent);
+
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                System.out.println("JSON FROM SERVER: " + json);
+                                server.writeJsonToFile(json, FILE_NAME);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            try {
+                                jsonFromFile = server.readJsonFromFile(FILE_NAME);
+                                System.out.println("$$$$$ JSON FROM FILE: " + jsonFromFile);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
                 }
             });
             thread.start();
-
-            try {
-                System.out.println("JSON FROM SERVER: " + json);
-                server.writeJsonToFile(json, FILE_NAME);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
 
-        try {
-            String jsonFromFile = server.readJsonFromFile(FILE_NAME);
-            System.out.println("$$$$$ JSON FROM FILE: " + jsonFromFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
 

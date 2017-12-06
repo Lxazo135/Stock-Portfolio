@@ -43,7 +43,7 @@ public class PortfolioFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                ((MainActivity)getActivity()).stockSelected(symbols.get(i));
+                ((MainActivity)getActivity()).stockSelected(symbols.get(i), i);
             }
         });
 
@@ -57,7 +57,7 @@ public class PortfolioFragment extends Fragment {
     }
 
     public interface StockSelectable{
-        public void stockSelected(String symbol);
+        public void stockSelected(String symbol, int index);
     }
 
 }

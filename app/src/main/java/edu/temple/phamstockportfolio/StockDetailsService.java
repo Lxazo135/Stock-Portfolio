@@ -80,15 +80,16 @@ public class StockDetailsService extends Service {
         return buffer.toString();
     }
 
-    public void writeJsonToFile(String json, String fileName) throws IOException {
+    public void writeJsonToFile(String symbol, String json, String fileName) throws IOException {
 
         File stockFile = new File(this.getFilesDir(), fileName);
         if(!stockFile.exists()){
             stockFile.createNewFile();
         }
         FileWriter fw = new FileWriter(stockFile, true);
-        fw.append(json);
+        fw.append(symbol);
         fw.append("\n");
+        fw.append(json);
         fw.flush();
         fw.close();
     }
@@ -105,7 +106,7 @@ public class StockDetailsService extends Service {
         fw.close();
     }
 
-    public String readJsonFromFile(String fileName) throws IOException {
+    public String readFile(String fileName) throws IOException {
         String filePath = this.getFilesDir() + "/" + fileName;
         File file = new File(filePath);
 
@@ -118,6 +119,23 @@ public class StockDetailsService extends Service {
             sb.append(line);
         }
 
+        return sb.toString();
+    }
+
+    public String readLine(String fileName,int index) throws IOException {
+        String filePath = this.getFilesDir() + "/" + fileName;
+        File file = new File(filePath);
+
+        FileInputStream fis = this.openFileInput(fileName);
+        InputStreamReader isr = new InputStreamReader(fis);
+        BufferedReader bufferedReader = new BufferedReader(isr);
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < index; i++){
+            bufferedReader.readLine();
+        }
+
+        sb.append(bufferedReader.readLine());
         return sb.toString();
     }
 }

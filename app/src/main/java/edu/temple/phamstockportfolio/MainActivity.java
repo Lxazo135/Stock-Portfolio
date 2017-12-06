@@ -31,9 +31,33 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
     final String HTTP = "http://dev.markitondemand.com/MODApis/Api/v2/Quote/json/?symbol=";
     final String FILE_NAME = "Stocks.txt";
     String json;
-    ServiceConnection serverConnection;
     Handler handler;
     String jsonFromFile;
+    Boolean first = true;
+    Boolean bounded;
+
+    ServiceConnection serverConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            StockDetailsService.LocalBinder binder = (StockDetailsService.LocalBinder)iBinder;
+            server = binder.getServerInstance();
+            bounded = true;
+            setListView();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
+        }
+    };
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+
+        Intent serviceIntent = new Intent(this, StockDetailsService.class);
+        this.bindService(serviceIntent, serverConnection, Context.BIND_AUTO_CREATE);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,23 +71,15 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         fm.beginTransaction().
                 add(R.id.viewFrame,nav).
                 commit();
+    }
 
-        serverConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                StockDetailsService.LocalBinder binder = (StockDetailsService.LocalBinder)iBinder;
-                server = binder.getServerInstance();
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName componentName) {
-
-            }
-        };
-
-        Intent serviceIntent = new Intent(this, StockDetailsService.class);
-        this.bindService(serviceIntent, serverConnection,Context.BIND_AUTO_CREATE);
-        this.startService(serviceIntent);
+    @Override
+    protected void onStop(){
+        super.onStop();
+        if(bounded){
+            unbindService(serverConnection);
+            bounded = false;
+        }
     }
 
     @Override
@@ -73,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         handler = new Handler();
         if(intent.hasExtra("symbol")){
             symbolFromIntent = intent.getStringExtra("symbol");
-            System.out.println("SYMBOLZZZZ: " + symbolFromIntent);
+            System.out.println("SYMBOL FROM INTENT: " + symbolFromIntent);
             nav.addSymbol(symbolFromIntent);
 
             Thread thread = new Thread(new Runnable() {
@@ -86,13 +102,17 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
                         public void run() {
                             try {
                                 System.out.println("JSON FROM SERVER: " + json);
-                                server.writeJsonToFile(json, FILE_NAME);
+                                if(first){
+                                    server.clearFile(FILE_NAME);
+                                    first = false;
+                                }
+                                server.writeJsonToFile(symbolFromIntent, json, FILE_NAME);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
 
                             try {
-                                jsonFromFile = server.readJsonFromFile(FILE_NAME);
+                                jsonFromFile = server.readFile(FILE_NAME);
                                 System.out.println("$$$$$ JSON FROM FILE: " + jsonFromFile);
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -115,8 +135,16 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         return true;
     }
 
-    public void stockSelected(String symbol) {
+    public void stockSelected(String symbol, int index) {
         details = StockDetailsFragment.newInstance(symbol);
+        String line = null;
+        try {
+            line = server.readLine(FILE_NAME, index * 2);//to read symbols
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("LINE READ FROM FILE:" + line);
 
         fm.beginTransaction().
                 replace(R.id.viewFrame,details).
@@ -134,6 +162,19 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
 
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void setListView(){
+        String symbol;
+        int i = 0;
+        try {
+            while((symbol = server.readLine(FILE_NAME, i)).length() != 0){
+                nav.addSymbol(symbol);
+                i += 2;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

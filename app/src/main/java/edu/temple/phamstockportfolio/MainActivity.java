@@ -103,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
                             try {
                                 System.out.println("JSON FROM SERVER: " + json);
                                 if(first){
-                                    server.clearFile(FILE_NAME);
                                     first = false;
                                 }
                                 server.writeJsonToFile(symbolFromIntent, json, FILE_NAME);
@@ -136,22 +135,13 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
     }
 
     public void stockSelected(String symbol, int index) {
-        details = StockDetailsFragment.newInstance(symbol);
-        String line = null;
+        String fileJson = null;
         try {
-            line = server.readLine(FILE_NAME, index + 12);//to read symbols
+            fileJson = server.readLine(FILE_NAME, (index * 2) + 1);//getting index of actual json in file
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        System.out.println("LINE READ FROM FILE:" + line);
-
-        /*
-        String s = "";
-        String p = null;
-        System.out.println("s:" + s);
-        System.out.println("p:" + p);
-        */
+        details = DetailsFragment.newInstance(symbol, fileJson);
 
         fm.beginTransaction().
                 replace(R.id.viewFrame,details).
@@ -166,7 +156,15 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
                 Intent searchIntent = new Intent(MainActivity.this, SymbolSearch.class);
                 MainActivity.this.startActivity(searchIntent);
                 return true;
-
+            case R.id.action_clearSymbols:
+                try {
+                    server.clearFile(FILE_NAME);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                finish();
+                startActivity(getIntent());
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

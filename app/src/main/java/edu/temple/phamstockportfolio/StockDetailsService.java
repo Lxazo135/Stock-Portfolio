@@ -17,14 +17,45 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class StockDetailsService extends Service {
 
     IBinder mBinder = new LocalBinder();
+    final private String FILE_NAME = "Stocks.txt";
+    final String HTTP = "http://dev.markitondemand.com/MODApis/Api/v2/Quote/json/?symbol=";
+
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        System.out.println("SERVICE BOUND");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true) {
+                    try {
+                        Thread.sleep(30000);
+                        ArrayList<String> symbols = getSymbols(FILE_NAME);
+                        String json;
+                        String symbol;
+
+                        clearFile(FILE_NAME);
+                        for (int i = 0; i < symbols.size(); i++) {
+                            symbol = symbols.get(i);
+                            json = getJson(HTTP + symbol);
+                            writeJsonToFile(symbol, json, FILE_NAME);
+                        }
+                        String file = readFile(FILE_NAME);
+                        System.out.print("FILE UPDATE IN SERVICE: " + file);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
         return mBinder;
     }
 
@@ -38,6 +69,11 @@ public class StockDetailsService extends Service {
         public StockDetailsService getServerInstance() {
             return StockDetailsService.this;
         }
+    }
+
+    @Override
+    public void onCreate(){
+
     }
 
     public String getJson(String http){
@@ -137,5 +173,20 @@ public class StockDetailsService extends Service {
 
         sb.append(bufferedReader.readLine());
         return sb.toString();
+    }
+    
+    public ArrayList<String> getSymbols(String fileName){
+        ArrayList<String> symbols = new ArrayList<String>();
+        String symbol;
+        int i = 0;
+        try {
+            while(!(symbol = readLine(fileName, i)).equals("null")){
+                symbols.add(symbol);
+                i += 2;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return symbols;
     }
 }

@@ -8,4 +8,10 @@
         android:title="@string/addSymbol"
         app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/action_clearSymbols"
+        android:icon="@drawable/ic_action_clear"
+        android:title="Clear Symbols"
+        app:showAsAction="ifRoom"/>
+
 </menu>

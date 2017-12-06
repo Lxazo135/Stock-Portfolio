@@ -1,13 +1,28 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="edu.temple.phamstockportfolio.DetailsFragment">
+    tools:context="edu.temple.phamstockportfolio.DetailsFragment"
+    android:orientation="vertical">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/symbol"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:textSize="24sp" />
+    <TextView
+        android:id="@+id/stockName"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:textSize="24sp" />
+    <TextView
+        android:id="@+id/stockPrice"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:textSize="24sp" />
+    <WebView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:id="@+id/stockChart"/>
 
-</FrameLayout>
+</LinearLayout>

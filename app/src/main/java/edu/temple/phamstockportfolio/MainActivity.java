@@ -139,12 +139,19 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         details = StockDetailsFragment.newInstance(symbol);
         String line = null;
         try {
-            line = server.readLine(FILE_NAME, index * 2);//to read symbols
+            line = server.readLine(FILE_NAME, index + 12);//to read symbols
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         System.out.println("LINE READ FROM FILE:" + line);
+
+        /*
+        String s = "";
+        String p = null;
+        System.out.println("s:" + s);
+        System.out.println("p:" + p);
+        */
 
         fm.beginTransaction().
                 replace(R.id.viewFrame,details).
@@ -169,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         String symbol;
         int i = 0;
         try {
-            while((symbol = server.readLine(FILE_NAME, i)).length() != 0){
+            while(!(symbol = server.readLine(FILE_NAME, i)).equals("null")){
                 nav.addSymbol(symbol);
                 i += 2;
             }

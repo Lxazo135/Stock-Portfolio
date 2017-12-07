@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
     String jsonFromFile;
     Boolean first = true;
     Boolean bounded;
+    Boolean twoPane = false;
 
     ServiceConnection serverConnection = new ServiceConnection() {
         @Override
@@ -71,6 +72,10 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         fm.beginTransaction().
                 add(R.id.viewFrame,nav).
                 commit();
+
+        if(findViewById(R.id.detailsFrame) != null){
+            twoPane = true;
+        }
     }
 
     @Override
@@ -102,9 +107,6 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
                         public void run() {
                             try {
                                 System.out.println("JSON FROM SERVER: " + json);
-                                if(first){
-                                    first = false;
-                                }
                                 server.writeJsonToFile(symbolFromIntent, json, FILE_NAME);
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -143,10 +145,25 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         }
         details = DetailsFragment.newInstance(symbol, fileJson);
 
-        fm.beginTransaction().
-                replace(R.id.viewFrame,details).
-                addToBackStack(null).
-                commit();
+        if((twoPane)){
+            if(fm.findFragmentById(R.id.detailsFrame) == null) {
+                fm.beginTransaction().
+                        add(R.id.detailsFrame, details).
+                        commit();
+            }
+            else{
+                fm.beginTransaction().
+                        replace(R.id.detailsFrame, details).
+                        commit();
+            }
+        }
+        else{
+            fm.beginTransaction().
+                    replace(R.id.viewFrame,details).
+                    addToBackStack(null).
+                    commit();
+        }
+
     }
 
     @Override

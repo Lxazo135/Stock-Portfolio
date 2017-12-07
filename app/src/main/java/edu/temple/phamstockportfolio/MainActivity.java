@@ -14,8 +14,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.EditText;
 
 import java.io.IOException;
 
@@ -25,17 +23,15 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
     public FragmentManager fm;
     public PortfolioFragment nav;
     public Fragment details;
-    public EditText editText;
-    public Button button;
     String symbolFromIntent = "";
     final String HTTP = "http://dev.markitondemand.com/MODApis/Api/v2/Quote/json/?symbol=";
     final String FILE_NAME = "Stocks.txt";
     String json;
     Handler handler;
     String jsonFromFile;
-    Boolean first = true;
     Boolean bounded;
     Boolean twoPane = false;
+    private static final String NAV_FRAG_TAG = "NavFrag";
 
     ServiceConnection serverConnection = new ServiceConnection() {
         @Override
@@ -52,13 +48,6 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         }
     };
 
-    @Override
-    protected void onStart(){
-        super.onStart();
-
-        Intent serviceIntent = new Intent(this, StockDetailsService.class);
-        this.bindService(serviceIntent, serverConnection, Context.BIND_AUTO_CREATE);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,15 +56,26 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
 
-        nav = new PortfolioFragment();
         fm = getFragmentManager();
-        fm.beginTransaction().
-                add(R.id.viewFrame,nav).
-                commit();
+        nav = (PortfolioFragment) fm.findFragmentByTag(NAV_FRAG_TAG);
+        if(nav == null){
+            nav = new PortfolioFragment();
+            fm.beginTransaction().
+                    add(R.id.viewFrame,nav,NAV_FRAG_TAG).
+                    commit();
+        }
+        else{
+            fm.beginTransaction().
+                    replace(R.id.viewFrame,nav,NAV_FRAG_TAG).
+                    commit();
+        }
 
         if(findViewById(R.id.detailsFrame) != null){
             twoPane = true;
         }
+
+        Intent serviceIntent = new Intent(this, StockDetailsService.class);
+        this.bindService(serviceIntent, serverConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         }
         details = DetailsFragment.newInstance(symbol, fileJson);
 
-        if((twoPane)){
+        if(twoPane){
             if(fm.findFragmentById(R.id.detailsFrame) == null) {
                 fm.beginTransaction().
                         add(R.id.detailsFrame, details).
@@ -158,13 +158,24 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
             }
         }
         else{
-            fm.beginTransaction().
-                    replace(R.id.viewFrame,details).
-                    addToBackStack(null).
-                    commit();
+            if(fm.findFragmentById(R.id.topDetailsFrame) == null){
+                fm.beginTransaction().
+                        add(R.id.viewFrame,details).
+                        show(details).
+                        hide(nav).
+                        commit();
+            }
+            else{
+                fm.beginTransaction().
+                        replace(R.id.viewFrame,details).
+                        hide(nav).
+                        show(details).
+                        commit();
+            }
         }
 
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
@@ -182,10 +193,20 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
                 finish();
                 startActivity(getIntent());
                 return true;
+            case R.id.action_back:
+                if(!twoPane && !fm.findFragmentByTag(NAV_FRAG_TAG).isVisible()) {
+                    fm.beginTransaction().
+                        setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).
+                        hide(details).
+                        show(nav).
+                        commit();
+                }
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
 
     public void setListView(){
         String symbol;

@@ -155,6 +155,10 @@ public class StockDetailsService extends Service {
             sb.append(line);
         }
 
+        bufferedReader.close();
+        isr.close();
+        fis.close();
+
         return sb.toString();
     }
 
@@ -172,6 +176,9 @@ public class StockDetailsService extends Service {
         }
 
         sb.append(bufferedReader.readLine());
+        bufferedReader.close();
+        isr.close();
+        fis.close();
         return sb.toString();
     }
     

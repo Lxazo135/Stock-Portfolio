@@ -74,8 +74,8 @@ public class DetailsFragment extends Fragment {
 
         try {
             jsonObject = new JSONObject(json);
-            name.setText("Name: " + jsonObject.getString("Name"));
-            price.setText("Price: " + jsonObject.getString("LastPrice"));
+            name.setText(getString(R.string.stockName) + jsonObject.getString("Name"));
+            price.setText(getString(R.string.stockPrice) + jsonObject.getString("LastPrice"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

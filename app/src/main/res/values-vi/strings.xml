@@ -1,0 +1,8 @@
+<resources>
+
+    <string name="app_name">Cổ Phần Danh Mục</string>
+    <string name="empty">vui lòng nhập mã chứng khoán</string>
+    <string name="stockName">Tên: </string>
+    <string name="stockPrice">Giá Bán: </string>
+
+</resources>

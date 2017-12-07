@@ -2,6 +2,7 @@ package edu.temple.phamstockportfolio;
 
 
 import android.app.Fragment;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -20,7 +22,7 @@ public class PortfolioFragment extends Fragment {
     private View v;
     private ArrayAdapter adapter;
     private ArrayList<String> symbols;
-
+    private ListView listView;
     public PortfolioFragment() {
         // Required empty public constructor
     }
@@ -37,7 +39,7 @@ public class PortfolioFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         v = inflater.inflate(R.layout.fragment_portfolio, container, false);
-        ListView listView = (ListView) v.findViewById(R.id.listView);
+        listView = (ListView) v.findViewById(R.id.listView);
         adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, symbols);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -46,6 +48,11 @@ public class PortfolioFragment extends Fragment {
                 ((MainActivity)getActivity()).stockSelected(symbols.get(i), i);
             }
         });
+
+        if(listView.getCount() == 0){
+            TextView emptyText = (TextView) v.findViewById(R.id.empty);
+            listView.setEmptyView(emptyText);
+        }
 
         return v;
     }
@@ -60,4 +67,7 @@ public class PortfolioFragment extends Fragment {
         public void stockSelected(String symbol, int index);
     }
 
+    public void changeColor(String color){
+        v.setBackgroundColor(Color.parseColor(color));
+    }
 }

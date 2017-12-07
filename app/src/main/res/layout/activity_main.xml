@@ -16,15 +16,19 @@
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
-
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <FrameLayout
+        android:id="@+id/topDetailsFrame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/viewFrame"
-        tools:context="edu.temple.stockportfolio.MainActivity">
+        android:layout_height="match_parent">
 
+        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/viewFrame"
+            tools:context="edu.temple.phamstockportfolio.MainActivity">
+        </FrameLayout>
 
     </FrameLayout>
 

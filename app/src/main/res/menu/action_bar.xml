@@ -3,9 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_back"
+        android:icon="@drawable/ic_action_back"
+        android:title="Return to navagation"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/action_addSymbol"
         android:icon="@drawable/ic_action_add"
-        android:title="@string/addSymbol"
+        android:title="Add symbol"
         app:showAsAction="ifRoom"/>
 
     <item
